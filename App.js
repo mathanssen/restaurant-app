@@ -1,6 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import {dbInit} from "./helpers/database/db";
+
+
+// Call Database Init
+dbInit().then((res) => {
+    console.log('Database initialization completed');
+}).catch(err => {
+    console.log('Database initialization failed');
+    console.log(err);
+});
 
 
 export default function App() {
