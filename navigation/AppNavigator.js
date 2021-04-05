@@ -6,6 +6,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import {UserProfileScreen} from "../screens/user/UserProfileScreen";
 import {SignInScreen} from "../screens/user/SignInScreen";
 import {SignupScreen} from "../screens/user/SignupScreen";
+import {DBTestScreen} from "../screens/test/DBTestScreen";
 
 import Colors from "../constants/Colors";
 
@@ -28,10 +29,12 @@ const StoreNavigator = createStackNavigator({
     UserProfile: {
         screen: UserProfileScreen,
     },
+    DBTestScripts: {
+      screen: DBTestScreen,
+    },
 }, {
     defaultNavigationOptions: defaultStackNavOptions,
 });
-
 
 const AuthNavigator = createStackNavigator({
     Signin: {

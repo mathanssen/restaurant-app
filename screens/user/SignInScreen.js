@@ -2,7 +2,7 @@ import React,{useState, useEffect, useCallback} from "react";
 import {ScrollView, StyleSheet, View, Text, TextInput, Button,KeyboardAvoidingView, Alert, ActivityIndicator} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import Colors from "../../constants/Colors";
-import { insertCustomer, fetchCustomer, loginCustomer} from '../../helpers/db';
+import {loginCustomer} from "../../helpers/db";
 
 export const SignInScreen = (props) => {
 
@@ -13,19 +13,21 @@ export const SignInScreen = (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
+    const navigateToAppHomeScreen = () => {
+        props.navigation.navigate({
+            routeName: 'UserProfile',
+            params: {
+                customerEmail: customerEmail,
+                isLoggedIn: true,
+            }
+        });
+    };
+
     useEffect(() => {
 
         if (isLoggedIn && customerEmail) {
-
-            props.navigation.navigate({
-                routeName: 'UserProfile',
-                params: {
-                    customerEmail: customerEmail,
-                    isLoggedIn: true,
-                }
-            });
+            navigateToAppHomeScreen();
         };
-
 
     },[isLoggedIn]);
 

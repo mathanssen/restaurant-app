@@ -19,6 +19,10 @@ export const UserProfileScreen = (props) => {
     const customerEmail = props.navigation.getParam('customerEmail');
     const [isLoggedIn, setIsLoggedIn] = useState(props.navigation.getParam('isLoggedIn'));
 
+    const dbTestScriptHandler = () => {
+        props.navigation.navigate('DBTestScripts')
+    }
+
     const navigateToSignin = () => {
         props.navigation.navigate({
             routeName: 'Signin',
@@ -190,6 +194,11 @@ export const UserProfileScreen = (props) => {
 
                             <View style={styles.buttonContainer} onPress={updateProfileHandler}>
                                 <Button title="Delete Account" color={Colors.accentColor} onPress={deleteAccountHandler}/>
+                            </View>
+
+
+                            <View style={styles.buttonContainer} onPress={updateProfileHandler}>
+                                <Button title="DB Test Scripts" color={Colors.accentColor} onPress={dbTestScriptHandler}/>
                             </View>
 
 

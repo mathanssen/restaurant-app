@@ -10,7 +10,7 @@ export const dbInit = () => {
 
     const promise = new Promise((resolve, reject) => {
 
-        const [customers, orders, showTables] = statements;
+        const [customers, orders, showTables, showCustomers, showAllOrders] = statements;
 
         dbStmtExec(customers)
             .then((res) => {
@@ -19,6 +19,12 @@ export const dbInit = () => {
             }).then((res) => {
             console.log(res);
             return dbStmtExec(showTables);
+        }).then((res) => {
+            console.log(res);
+            return dbStmtExec(showCustomers)
+        }).then((res) => {
+            console.log(res);
+            return dbStmtExec(showAllOrders)
         }).then((res) => {
             console.log(res);
         }).catch(err => {
@@ -146,6 +152,84 @@ export const deleteCustomer = (email) => {
         });
     });
 
+    return promise;
+};
+
+
+// insertCustomerOrder - adds a new order record
+export const insertCustomerOrder = (customerId,customerName, customerBillingAddress,customerShippingAddress,subtotalAmount, discountPercent ) => {
+
+    const promise = new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql('INSERT INTO orders (order_id, customer_id, customer_name,customer_billing_address,customer_shipping_address,subtotal_amount,discount_percent) VALUES (?, ?, ?, ?, ?,?,?)',
+                [new Date().getTime(), customerId,customerName, customerBillingAddress,customerShippingAddress,subtotalAmount, discountPercent],
+                (_, result) => {
+                    resolve(result);
+                },
+                (_, err) => {
+                    reject(err);
+                }
+            );
+        });
+    });
+    return promise;
+};
+
+// updateCustomerOrder - update customer order data
+export const updateCustomerOrder = (customerId,orderId, customerName, customerBillingAddress,customerShippingAddress,subtotalAmount, discountPercent) => {
+
+    const promise = new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql('UPDATE orders SET customer_name = ?, customer_billing_address = ?, customer_shipping_address = ?, subtotal_amount = ?, discount_percent = ?  WHERE customer_id = ? and order_id = ?',
+                [customerName, customerBillingAddress,customerShippingAddress,subtotalAmount, discountPercent, customerId,orderId],
+                (_, result) => {
+                    resolve(result);
+                },
+                (_, err) => {
+                    reject(err);
+                }
+            );
+        });
+    });
+
+    return promise;
+};
+
+// fetchCustomerOrders - Fetches all orders for a particular customer
+export const fetchCustomerOrders = (customerId) => {
+
+    const promise = new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql('SELECT * from orders WHERE customer_id = ? order by order_date desc',
+                [customerId],
+                (_, result) => {
+                    resolve(result);
+                },
+                (_, err) => {
+                    reject(err);
+                }
+            );
+        });
+    });
+    return promise;
+};
+
+// fetchCustomerOrder - Fetech a singler order for a customer
+export const fetchCustomerOrder = (customerId,orderId) => {
+
+    const promise = new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql('SELECT * from orders WHERE customer_id = ? and order_id = ?',
+                [customerId, orderId],
+                (_, result) => {
+                    resolve(result);
+                },
+                (_, err) => {
+                    reject(err);
+                }
+            );
+        });
+    });
     return promise;
 };
 
