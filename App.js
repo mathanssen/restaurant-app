@@ -1,13 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Home from "./HomeScreen";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { dbInit } from "./helpers/database/db";
 
+// Call Database Init
+dbInit()
+  .then((res) => {
+    console.log("Database initialization completed");
+  })
+  .catch((err) => {
+    console.log("Database initialization failed");
+    console.log(err);
+  });
 
 export default function App() {
-  return <Home />
-  
-  
+  return <Home />;
+
   // (
   //   <View style={styles.container}>
   //     <Text>Open up App.js to start working on your app!</Text>
@@ -19,8 +27,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
