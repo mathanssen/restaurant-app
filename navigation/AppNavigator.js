@@ -6,7 +6,6 @@ import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 
 // Drawer
 import { DrawerContent } from "./DrawerContent";

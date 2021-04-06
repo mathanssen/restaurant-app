@@ -18,6 +18,7 @@ import Slider from "@react-native-community/slider";
 import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
+import Modal from "react-native-modal";
 
 export const HomeScreen = (props) => {
   // Settings
@@ -35,7 +36,9 @@ export const HomeScreen = (props) => {
   const [showOptions, setShowOptions] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [cart, setCart] = useState([]);
-  const [modalVisible, setModalVisible] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState("");
+  const [modalDescription, setModalDescription] = useState("");
 
   // Category Array
   const categoryData = [
@@ -62,7 +65,7 @@ export const HomeScreen = (props) => {
   const order = new Order(
     customerName,
     customerBillingAddress,
-    shippingAddress,
+    shippingAddress
   );
 
   // Add food to cart
@@ -183,12 +186,12 @@ export const HomeScreen = (props) => {
    */
   const navigateToPayment = () => {
     props.navigation.navigate({
-      routeName: 'Checkout',
+      routeName: "Checkout",
       params: {
-          order: order,
-      }
-  });
-  }
+        order: order,
+      },
+    });
+  };
 
   // Display filter options when the button is pressed
   function renderFilterOptions() {
@@ -212,9 +215,36 @@ export const HomeScreen = (props) => {
   /*
    * @TODO show details
    */
-  function detailsPressed() {
-    console.log("Pressed");
+  function renderModal() {
+    return (
+      <View>
+        {isModalVisible == true ? (
+          <View style={{ flex: 1 }}>
+            <Modal isVisible={isModalVisible}>
+              <Image
+                source={{ uri: modalImage }}
+                resizeMode="cover"
+                style={styles.restaurantImgModal}
+              />
+              <Text style={styles.restaurantDescModal}>{modalDescription}</Text>
+              <Button
+                color={COLORS.primary}
+                marginTop={40}
+                title="Back"
+                onPress={toggleModal}
+              />
+            </Modal>
+          </View>
+        ) : (
+          <View></View>
+        )}
+      </View>
+    );
   }
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   // Render Header
   function renderHeader() {
@@ -339,8 +369,9 @@ export const HomeScreen = (props) => {
       <TouchableOpacity
         style={styles.cartTouchable}
         onPress={() => {
-          detailsPressed();
-          console.log("Pressed");
+          setModalImage(item.Image);
+          setModalDescription(item.Description);
+          toggleModal();
         }}
       >
         {/* Image */}
@@ -491,6 +522,7 @@ export const HomeScreen = (props) => {
   return (
     <View style={styles.container}>
       {renderHeader()}
+      {renderModal()}
       {renderCart()}
     </View>
   );
@@ -576,6 +608,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 30,
+  },
+  restaurantImgModal: {
+    width: "90%",
+    margin: 10,
+    height: 400,
   },
   restaurantTitle: {
     fontSize: 23,
@@ -717,6 +754,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
+  },
+  restaurantDescModal: {
+    color: COLORS.white,
+    justifyContent: "center",
+    textAlign: "center",
+    marginBottom: 30,
+    fontSize: 15,
+    alignContent: "center",
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
