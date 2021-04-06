@@ -213,8 +213,9 @@ export const CheckoutScreen = (props) => {
   );
 };
 
+// Navigation Settings
 CheckoutScreen.navigationOptions = {
-  headerTitle: 'Checkout'
+  headerTitle: "Checkout",
 };
 
 // Style

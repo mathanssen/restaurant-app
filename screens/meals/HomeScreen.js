@@ -212,9 +212,7 @@ export const HomeScreen = (props) => {
     }
   }
 
-  /*
-   * @TODO show details
-   */
+  // Show details when pressed
   function renderModal() {
     return (
       <View>
@@ -242,6 +240,7 @@ export const HomeScreen = (props) => {
     );
   }
 
+  // Set modal
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -337,11 +336,6 @@ export const HomeScreen = (props) => {
               style={styles.buttonFilter}
             >
               <Text style={[styles.applyText]}>Apply</Text>
-              {/* <Image
-                source={icons.filter}
-                resizeMode="contain"
-                style={styles.filterImg}
-              /> */}
             </TouchableOpacity>
           </View>
         )}
@@ -374,30 +368,22 @@ export const HomeScreen = (props) => {
           toggleModal();
         }}
       >
-        {/* Image */}
         <View style={styles.cartView}>
           <Image
             source={{ uri: item.Image }}
             resizeMode="cover"
             style={styles.restaurantImg}
           />
-
           <View style={styles.price}>
             <Text style={styles.priceText}>$ {item.Price}</Text>
           </View>
         </View>
-
-        {/* Restaurant Info */}
         <Text style={styles.restaurantTitle}>{item.Title}</Text>
         <Text style={styles.restaurantCategoryText}>{item.Category}</Text>
-
-        {/* Rating */}
         <View style={styles.ratings}>
           <Image source={icons.star} style={styles.restaurantRating} />
           <Text style={styles.restaurantRatingFont}>{item.Ratings}</Text>
         </View>
-
-        {/* Categories */}
         <View style={styles.restaurantCategoryView}>
           {item.Available == 1 ? (
             <NumericInput
@@ -426,13 +412,9 @@ export const HomeScreen = (props) => {
     const renderItemCart = ({ item }) => (
       <TouchableOpacity style={styles.cartRender}>
         <View style={styles.cartRenderView}></View>
-
-        {/* Restaurant Info */}
         <Text style={styles.cartRestaurantInfo}>{item.Title}</Text>
-
         <View style={styles.cartRestaurantInfoView}>
           <View style={styles.cartRestaurantPriceView}>
-            {/* Price */}
             <Text style={styles.cartRestaurantPrice}>${item.Price}</Text>
           </View>
           <View style={styles.cartNumericInput}>
@@ -528,6 +510,7 @@ export const HomeScreen = (props) => {
   );
 };
 
+// Navigation Settings
 HomeScreen.navigationOptions = {
   headerTitle: "Home",
 };
