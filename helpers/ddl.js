@@ -21,8 +21,8 @@ export const statements = [
     {
         name: 'create-table: orders',
         sqltext: `CREATE TABLE IF NOT EXISTS orders
-            (order_id INTEGER NOT NULL,
-            customer_id INTEGER NOT NULL,
+            (order_id IDENTITY (1,1) NOT NULL,
+            customer_id VARCHAR(100) NOT NULL,
             customer_name VARCHAR(100) NOT NULL,
             customer_billing_address VARCHAR(150) NOT NULL,
             customer_shipping_address VARCHAR(150) NOT NULL,
@@ -35,5 +35,13 @@ export const statements = [
     {
         name: 'showTables',
         sqltext: `SELECT name FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY 1;`,
+    },
+    {
+      name: 'showCustomers',
+      sqltext: 'SELECT * from customers',
+    },
+    {
+        name: 'showAllOrders',
+        sqltext: 'SELECT * from orders',
     },
 ];

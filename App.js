@@ -7,6 +7,23 @@ import Checkout from "./CheckoutScreen";
 import Confirmation from "./ConfirmationScreen";
 import HomeScreen from "./HomeScreen";
 import CheckoutScreen from "./CheckoutScreen";
+import React,{useState} from 'react';
+import * as Font from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import { enableScreens } from 'react-native-screens';
+import AppNavigator from "./navigation/AppNavigator";
+import {dbInit} from "./helpers/db";
+
+enableScreens();
+
+// Fonts - Fetch and Load
+const fetchFonts = () => {
+    return Font.loadAsync({
+        'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+        'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
+    });
+};
+
 
 // Call Database Init
 dbInit()
@@ -19,14 +36,19 @@ dbInit()
   });
 
 export default function App() {
-  return <Home />;
-}
+    const [fontLoaded, setFontLoaded] = useState(false);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+    if (!fontLoaded) {
+        return (
+            <AppLoading
+                startAsync={fetchFonts}
+                onFinish={() => setFontLoaded(true)}
+                onError={console.warn}
+            />
+        );
+    }
+
+    return (
+        <AppNavigator />
+    );
+}
