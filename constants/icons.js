@@ -23,6 +23,7 @@ export const basket = require("../assets/icons/shopping-basket.png");
 export const star = require("../assets/icons/star.png");
 export const sushi = require("../assets/icons/sushi.png");
 export const user = require("../assets/icons/user.png");
+export const filter = require("../assets/icons/filter.png");
 
 export default {
     back,
@@ -50,4 +51,5 @@ export default {
     star,
     sushi,
     user,
+    filter,
 }

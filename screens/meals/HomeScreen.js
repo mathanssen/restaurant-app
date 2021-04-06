@@ -12,14 +12,14 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { icons, SIZES, COLORS, FONTS } from "./constants";
+import { icons, SIZES, COLORS, FONTS } from "../../constants";
 import DropDownPicker from "react-native-dropdown-picker";
 import Slider from "@react-native-community/slider";
 import NumericInput from "react-native-numeric-input";
-import Order from "./Order";
-import Food from "./Food";
+import Order from "../../classes/Order";
+import Food from "../../classes/Food";
 
-function HomeScreen() {
+export const HomeScreen = (navigation) => {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -35,6 +35,7 @@ function HomeScreen() {
   const [showOptions, setShowOptions] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [cart, setCart] = useState([]);
+  const [modalVisible, setModalVisible] = useState(true);
 
   // Category Array
   const categoryData = [
@@ -63,6 +64,15 @@ function HomeScreen() {
     customerBillingAddress,
     shippingAddress
   );
+
+  const navigateToPayment = () => {
+    navigation.navigate({
+      routeName: "Checkout",
+      params: {
+        order: order,
+      },
+    });
+  };
 
   // Add food to cart
   function addToCart(item, quantity) {
@@ -180,7 +190,10 @@ function HomeScreen() {
   /*
    * @TODO use navigator to go to checkout screen
    */
-  function goToCheckout() {}
+  function goToCheckout() {
+    navigateToPayment()
+    // console.log("Pressed");
+  }
 
   // Display filter options when the button is pressed
   function renderFilterOptions() {
@@ -201,6 +214,13 @@ function HomeScreen() {
     }
   }
 
+  /*
+   * @TODO show details
+   */
+  function detailsPressed() {
+    console.log("Pressed");
+  }
+
   // Render Header
   function renderHeader() {
     return (
@@ -208,29 +228,41 @@ function HomeScreen() {
       <View>
         {showOptions == false ? (
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => {
-                renderFilterOptions();
-              }}
-              style={styles.filter}
-            >
-              <Image
-                source={icons.list}
-                resizeMode="contain"
-                style={styles.img}
-              />
-            </TouchableOpacity>
+            {showCart == false ? (
+              <TouchableOpacity
+                onPress={() => {
+                  renderFilterOptions();
+                }}
+                style={styles.filter}
+              >
+                <Image
+                  source={icons.filter}
+                  resizeMode="contain"
+                  style={styles.img}
+                />
+              </TouchableOpacity>
+            ) : (
+              <Text></Text>
+            )}
             <TouchableOpacity
               onPress={() => {
                 displayCart();
               }}
               style={styles.cart}
             >
-              <Image
-                source={icons.basket}
-                resizeMode="contain"
-                style={styles.cartImg}
-              />
+              {showCart == false ? (
+                <Image
+                  source={icons.basket}
+                  resizeMode="contain"
+                  style={styles.cartImg}
+                />
+              ) : (
+                <Image
+                  source={icons.back}
+                  resizeMode="contain"
+                  style={styles.cartImg}
+                />
+              )}
             </TouchableOpacity>
           </View>
         ) : (
@@ -277,13 +309,14 @@ function HomeScreen() {
               onPress={() => {
                 renderFilterOptions();
               }}
-              style={styles.filterIcon}
+              style={styles.buttonFilter}
             >
-              <Image
-                source={icons.list}
+              <Text style={[styles.applyText]}>Apply</Text>
+              {/* <Image
+                source={icons.filter}
                 resizeMode="contain"
                 style={styles.filterImg}
-              />
+              /> */}
             </TouchableOpacity>
           </View>
         )}
@@ -308,7 +341,13 @@ function HomeScreen() {
   // Render Cart
   function renderCart() {
     const renderItem = ({ item }) => (
-      <TouchableOpacity style={styles.cartTouchable}>
+      <TouchableOpacity
+        style={styles.cartTouchable}
+        onPress={() => {
+          detailsPressed();
+          console.log("Pressed");
+        }}
+      >
         {/* Image */}
         <View style={styles.cartView}>
           <Image
@@ -435,7 +474,9 @@ function HomeScreen() {
                       Final Amount: ${finalAmount}{" "}
                     </Text>
                     <Button
-                      onPress={goToCheckout()}
+                      onPress={() => {
+                        navigation.navigate("Checkout");
+                      }}
                       title="Proceed to Checkout"
                       color={COLORS.primary}
                     />
@@ -462,12 +503,15 @@ function HomeScreen() {
   );
 }
 
+HomeScreen.navigationOptions = {
+  headerTitle: 'Home'
+};
+
 // Style
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.lightGray4,
-    marginTop: 40,
     paddingHorizontal: 24,
   },
   header: {
@@ -526,8 +570,8 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   filterImg: {
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
   },
   cartTouchable: {
     marginBottom: 30,
@@ -635,6 +679,66 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 25,
     color: COLORS.primary,
+  },
+  buttonFilter: {
+    marginTop: 100,
+    height: 50,
+    width: 100,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#4a148c",
+    shadowColor: "#2AC062",
+    shadowOpacity: 0.4,
+    shadowOffset: { height: 10, width: 0 },
+    shadowRadius: 20,
+  },
+  applyText: {
+    fontSize: 16,
+    textTransform: "uppercase",
+    color: "#FFFFFF",
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
   },
 });
 

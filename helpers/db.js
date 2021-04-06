@@ -14,19 +14,19 @@ export const dbInit = () => {
 
         dbStmtExec(customers)
             .then((res) => {
-                console.log(res);
+                // console.log(res);
                 return dbStmtExec(orders);
             }).then((res) => {
-            console.log(res);
+            // console.log(res);
             return dbStmtExec(showTables);
         }).then((res) => {
-            console.log(res);
+            // console.log(res);
             return dbStmtExec(showCustomers)
         }).then((res) => {
-            console.log(res);
+            // console.log(res);
             return dbStmtExec(showAllOrders)
         }).then((res) => {
-            console.log(res);
+            // console.log(res);
         }).catch(err => {
             console.log('Database initialization failed');
             console.log(err);

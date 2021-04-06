@@ -8,16 +8,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import Constants from "expo-constants";
-import { dbInit } from "./helpers/database/db";
-import {
-  insertCustomerOrder,
-  fetchCustomerOrders,
-} from "./helpers/database/db";
+import { dbInit } from "../../helpers/db";
+import { insertCustomerOrder, fetchCustomerOrders } from "../../helpers/db";
 import { CreditCardInput } from "react-native-credit-card-input";
-import { icons, SIZES, COLORS, FONTS } from "./constants";
+import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export default function CheckoutScreen() {
+export const CheckoutScreen = (props) => {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -220,6 +216,10 @@ export default function CheckoutScreen() {
     </View>
   );
 }
+
+CheckoutScreen.navigationOptions = {
+  headerTitle: 'Checkout'
+};
 
 // Style
 const styles = StyleSheet.create({

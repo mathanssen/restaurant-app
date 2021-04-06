@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { icons, SIZES, COLORS, FONTS } from "./constants";
+import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export default function ConfirmationScreen() {
+export const  ConfirmationScreen = (props) => {
   /*
    * @TODO use navigator to go to home screen
    */
@@ -12,7 +12,7 @@ export default function ConfirmationScreen() {
     <View style={styles.container}>
       <Image
         style={styles.logo}
-        source={require("./assets/images/confirmation.png")}
+        source={require("../../assets/images/confirmation.png")}
       />
 
       <Text style={styles.orderPlaced}>Your order has been placed!</Text>
@@ -22,6 +22,10 @@ export default function ConfirmationScreen() {
     </View>
   );
 }
+
+ConfirmationScreen.navigationOptions = {
+  headerTitle: 'Confirmation'
+};
 
 const styles = StyleSheet.create({
   container: {

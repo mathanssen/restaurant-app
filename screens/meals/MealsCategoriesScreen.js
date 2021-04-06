@@ -2,13 +2,10 @@ import React from "react";
 import {View, Text, StyleSheet} from 'react-native';
 import {HeaderButtons, Item} from 'react-navigation-header-buttons';
 import {CustomHeaderButton} from "../../components/HeaderButton";
+import Home from "./HomeScreen"
 
 export const MealsCategoriesScreen = (props) => {
-    return (
-        <View>
-            <Text>Meals Categories Screen</Text>
-        </View>
-    );
+    return <Home />;
 };
 
 MealsCategoriesScreen.navigationOptions = (navigationData) => {
