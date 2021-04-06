@@ -1,7 +1,8 @@
 import React from "react";
 import {View, Text, Button} from 'react-native';
 import {insertCustomerOrder, fetchCustomerOrders} from "../../helpers/db";
-
+import {HeaderButtons, Item} from "react-navigation-header-buttons";
+import {CustomHeaderButton} from "../../components/HeaderButton";
 
 
 export const DBTestScreen = () => {
@@ -40,7 +41,19 @@ export const DBTestScreen = () => {
             <Button title="Fetch Customer Orders" onPress={fetchCustomerOrdersHandler} />
 
         </View>
-    )
+    );
 
+};
 
-}
+DBTestScreen.navigationOptions = (navigationData) => {
+    return {
+        headerTitle: 'Debug',
+        headerLeft: (
+            <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+                <Item title="Menu" iconName='ios-menu' onPress={() => {
+                    navigationData.navigation.toggleDrawer();
+                }}/>
+            </HeaderButtons>
+        )
+    }
+};

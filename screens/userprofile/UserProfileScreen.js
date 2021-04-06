@@ -2,8 +2,11 @@ import React, {useState, useEffect} from "react";
 import {View, Text, Button, KeyboardAvoidingView, ScrollView, TextInput, StyleSheet, Alert} from 'react-native';
 import {LinearGradient} from "expo-linear-gradient";
 import Colors from "../../constants/Colors";
-import {SignupScreen} from "./SignupScreen";
+import {SignupScreen} from "../auth/SignupScreen";
 import {fetchCustomer, deleteCustomer, updateCustomer} from "../../helpers/db";
+import {HeaderButtons, Item} from "react-navigation-header-buttons";
+import {CustomHeaderButton} from "../../components/HeaderButton";
+import {OrdersScreen} from "../orders/OrdersScreen";
 
 export const UserProfileScreen = (props) => {
 
@@ -211,9 +214,19 @@ export const UserProfileScreen = (props) => {
 
 };
 
-UserProfileScreen.navigationOptions = {
-    headerTitle: 'User Profile'
+UserProfileScreen.navigationOptions = (navigationData) => {
+    return {
+        headerTitle: 'User Profile',
+        headerLeft: (
+            <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+                <Item title="Menu" iconName='ios-menu' onPress={() => {
+                    navigationData.navigation.toggleDrawer();
+                }}/>
+            </HeaderButtons>
+        )
+    }
 };
+
 
 const styles = StyleSheet.create({
     screen: {

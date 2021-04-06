@@ -15,7 +15,7 @@ export const SignInScreen = (props) => {
 
     const navigateToAppHomeScreen = () => {
         props.navigation.navigate({
-            routeName: 'UserProfile',
+            routeName: 'MealCategories',
             params: {
                 customerEmail: customerEmail,
                 isLoggedIn: true,
