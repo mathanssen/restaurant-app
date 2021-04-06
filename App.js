@@ -2,6 +2,11 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { dbInit } from "./helpers/database/db";
+import Home from "./HomeScreen";
+import Checkout from "./CheckoutScreen";
+import Confirmation from "./ConfirmationScreen";
+import HomeScreen from "./HomeScreen";
+import CheckoutScreen from "./CheckoutScreen";
 
 // Call Database Init
 dbInit()
@@ -15,13 +20,6 @@ dbInit()
 
 export default function App() {
   return <Home />;
-
-  // (
-  //   <View style={styles.container}>
-  //     <Text>Open up App.js to start working on your app!</Text>
-  //     <StatusBar style="auto" />
-  //   </View>
-  // );
 }
 
 const styles = StyleSheet.create({
