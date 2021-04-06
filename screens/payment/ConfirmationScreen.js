@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export default function ConfirmationScreen() {
+export const ConfirmationScreen = (props) => {
   /*
    * @TODO use navigator to go to home screen
    */
@@ -21,7 +21,11 @@ export default function ConfirmationScreen() {
       </TouchableOpacity>
     </View>
   );
-}
+};
+
+ConfirmationScreen.navigationOptions = {
+  headerTitle: 'Confirmation'
+};
 
 const styles = StyleSheet.create({
   container: {

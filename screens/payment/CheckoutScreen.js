@@ -13,7 +13,7 @@ import { insertCustomerOrder, fetchCustomerOrders } from "../../helpers/db";
 import { CreditCardInput } from "react-native-credit-card-input";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export default function CheckoutScreen() {
+export const CheckoutScreen = (props) => {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -141,13 +141,13 @@ export default function CheckoutScreen() {
   // View
   return (
     <View style={styles.container}>
+      <Text>This is {route.params.test}'s profile</Text>;
       <TextInput
         placeholder="Name"
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
-
       <TextInput
         placeholder="Phone Number"
         value={phone}
@@ -156,7 +156,6 @@ export default function CheckoutScreen() {
         style={styles.input}
         maxLength={10}
       />
-
       <TextInput
         placeholder="Email"
         keyboardType="email-address"
@@ -164,21 +163,18 @@ export default function CheckoutScreen() {
         onChangeText={setEmail}
         style={styles.input}
       />
-
       <TextInput
         placeholder="Billing Address"
         value={billingAddress}
         onChangeText={setBillingAddress}
         style={styles.input}
       />
-
       <TextInput
         placeholder="Shipping Address"
         value={shippingAddress}
         onChangeText={setShippingAddress}
         style={styles.input}
       />
-
       <CreditCardInput
         onChange={(form) => {
           setCardNumber(form.values.number);
@@ -215,7 +211,11 @@ export default function CheckoutScreen() {
       </View>
     </View>
   );
-}
+};
+
+CheckoutScreen.navigationOptions = {
+  headerTitle: 'Checkout'
+};
 
 // Style
 const styles = StyleSheet.create({

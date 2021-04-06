@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
 
 // Drawer
 import { DrawerContent } from "./DrawerContent";
@@ -24,6 +25,10 @@ import { MealsCategoriesScreen } from "../screens/meals/MealsCategoriesScreen";
 import { FavouritesScreen } from "../screens/favourites/FavouritesScreen";
 import { HomeScreen } from "../screens/meals/HomeScreen";
 
+// Payment Screens
+import { CheckoutScreen } from "../screens/payment/CheckoutScreen";
+import { ConfirmationScreen } from "../screens/payment/ConfirmationScreen";
+
 // Orders Screen
 import { OrdersScreen } from "../screens/orders/OrdersScreen";
 import Colors from "../constants/Colors";
@@ -41,6 +46,24 @@ const defaultStackNavOptions = {
   headerTintColor: Platform.OS === "android" ? "white" : Colors.primaryColor,
   headerTitle: "DefaultScreen",
 };
+
+
+const PaymentNavigator = createStackNavigator(
+  {
+    Home: {
+      screen: HomeScreen,
+    },
+    Checkout: {
+      screen: CheckoutScreen,
+    },
+    Confirmation: {
+      screen: ConfirmationScreen,
+    },
+  },
+  {
+    defaultNavigationOptions: defaultStackNavOptions,
+  }
+);
 
 const AuthNavigator = createStackNavigator(
   {

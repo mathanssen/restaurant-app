@@ -19,7 +19,7 @@ import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
 
-export default function HomeScreen() {
+export const HomeScreen = (props) => {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -62,17 +62,8 @@ export default function HomeScreen() {
   const order = new Order(
     customerName,
     customerBillingAddress,
-    shippingAddress
+    shippingAddress,
   );
-
-  const navigateToPayment = () => {
-    navigation.navigate({
-      routeName: "Checkout",
-      params: {
-        order: order,
-      },
-    });
-  };
 
   // Add food to cart
   function addToCart(item, quantity) {
@@ -190,9 +181,13 @@ export default function HomeScreen() {
   /*
    * @TODO use navigator to go to checkout screen
    */
-  function goToCheckout() {
-    navigateToPayment();
-    // console.log("Pressed");
+  const navigateToPayment = () => {
+    props.navigation.navigate({
+      routeName: 'Checkout',
+      params: {
+          order: order,
+      }
+  });
   }
 
   // Display filter options when the button is pressed
@@ -339,7 +334,7 @@ export default function HomeScreen() {
   }
 
   // Render Cart
-  function renderCart() {
+  function renderCart(props) {
     const renderItem = ({ item }) => (
       <TouchableOpacity
         style={styles.cartTouchable}
@@ -474,9 +469,7 @@ export default function HomeScreen() {
                       Final Amount: ${finalAmount}{" "}
                     </Text>
                     <Button
-                      onPress={() => {
-                        navigation.navigate("Checkout");
-                      }}
+                      onPress={navigateToPayment}
                       title="Proceed to Checkout"
                       color={COLORS.primary}
                     />
@@ -501,7 +494,11 @@ export default function HomeScreen() {
       {renderCart()}
     </View>
   );
-}
+};
+
+HomeScreen.navigationOptions = {
+  headerTitle: "Home",
+};
 
 // Style
 const styles = StyleSheet.create({
