@@ -23,8 +23,11 @@ import {SignupScreen} from "../screens/auth/SignupScreen";
 import {MealsCategoriesScreen} from "../screens/meals/MealsCategoriesScreen";
 import {FavouritesScreen} from "../screens/favourites/FavouritesScreen";
 
-
+// Orders Screen
+import {OrdersScreen} from "../screens/orders/OrdersScreen";
 import Colors from "../constants/Colors";
+
+
 
 const defaultStackNavOptions = {
     headerStyle: {
@@ -79,6 +82,16 @@ const FavouritesNavigator = createStackNavigator({
     defaultNavigationOptions: defaultStackNavOptions,
 });
 
+// Orders Stack Navigator
+const OrdersNavigator = createStackNavigator({
+    Orders: {
+        screen: OrdersScreen,
+    },
+}, {
+    defaultNavigationOptions: defaultStackNavOptions,
+});
+
+
 const tabScreenConfig = {
     Store: {
         screen: StoreNavigator,
@@ -103,7 +116,7 @@ const tabScreenConfig = {
         },
     },
     Orders: {
-        screen: FavouritesNavigator,
+        screen: OrdersNavigator,
         navigationOptions: {
             tabBarIcon: (tabInfo) => {
                 return (
@@ -176,12 +189,6 @@ const MainNavigator = createDrawerNavigator({
         activeTintColor: Colors.accentColor,
         labelStyle: {
             fontFamily: 'open-sans-bold'
-        },
-        itemsContainerStyle: {
-            marginVertical: 0,
-        },
-        iconContainerStyle: {
-            opacity: 1
         }
     },
     // contentComponent: DrawerContent,
