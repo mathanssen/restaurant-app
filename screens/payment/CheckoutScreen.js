@@ -13,7 +13,7 @@ import { insertCustomerOrder, fetchCustomerOrders } from "../../helpers/db";
 import { CreditCardInput } from "react-native-credit-card-input";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export const CheckoutScreen = (props) => {
+export default function CheckoutScreen() {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -216,10 +216,6 @@ export const CheckoutScreen = (props) => {
     </View>
   );
 }
-
-CheckoutScreen.navigationOptions = {
-  headerTitle: 'Checkout'
-};
 
 // Style
 const styles = StyleSheet.create({

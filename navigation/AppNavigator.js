@@ -24,10 +24,6 @@ import { MealsCategoriesScreen } from "../screens/meals/MealsCategoriesScreen";
 import { FavouritesScreen } from "../screens/favourites/FavouritesScreen";
 import { HomeScreen } from "../screens/meals/HomeScreen";
 
-// Payment Screens
-import { CheckoutScreen } from "../screens/payment/CheckoutScreen";
-import { ConfirmationScreen } from "../screens/payment/ConfirmationScreen";
-
 // Orders Screen
 import { OrdersScreen } from "../screens/orders/OrdersScreen";
 import Colors from "../constants/Colors";
@@ -81,21 +77,6 @@ const StoreNavigator = createStackNavigator(
   {
     defaultNavigationOptions: defaultStackNavOptions,
   }
-);
-
-const PaymentNavigator = createStackNavigator(
-  {
-    Checkout: {
-      screen: CheckoutScreen,
-    },
-    Confirmation: {
-      screen: ConfirmationScreen,
-    },
-    Home: {
-        screen: HomeScreen,
-      },
-  },
-  { defaultNavigationOptions: defaultStackNavOptions }
 );
 
 // Favourites Stack Navigator

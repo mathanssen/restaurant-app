@@ -19,7 +19,7 @@ import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
 
-export const HomeScreen = (navigation) => {
+export default function HomeScreen() {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -191,7 +191,7 @@ export const HomeScreen = (navigation) => {
    * @TODO use navigator to go to checkout screen
    */
   function goToCheckout() {
-    navigateToPayment()
+    navigateToPayment();
     // console.log("Pressed");
   }
 
@@ -502,10 +502,6 @@ export const HomeScreen = (navigation) => {
     </View>
   );
 }
-
-HomeScreen.navigationOptions = {
-  headerTitle: 'Home'
-};
 
 // Style
 const styles = StyleSheet.create({
