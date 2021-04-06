@@ -1,23 +1,27 @@
 import React,{useState, useEffect, useCallback} from "react";
+import {useSelector, useDispatch} from 'react-redux';
 import {ScrollView, StyleSheet, View, Text, TextInput, Button,KeyboardAvoidingView, Alert, ActivityIndicator} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import Colors from "../../constants/Colors";
 import {loginCustomer} from "../../helpers/db";
+import {authInfoSet} from "../../store/actions/restaurant";
 
 export const SignInScreen = (props) => {
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [email, setEmail] = useState('');
+    const authInfo = useSelector(state => state.restaurant.authInfo)[0];
+    const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn);
+    const [email, setEmail] = useState(authInfo.userEmail);
     const [password, setPassword] = useState('');
-    const [customerEmail, setCustomerEmail] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Redux Dispatch to call actions
+    const dispatch = useDispatch();
 
     const navigateToAppHomeScreen = () => {
         props.navigation.navigate({
             routeName: 'MealCategories',
             params: {
-                customerEmail: customerEmail,
+                customerEmail: email,
                 isLoggedIn: true,
             }
         });
@@ -25,7 +29,7 @@ export const SignInScreen = (props) => {
 
     useEffect(() => {
 
-        if (isLoggedIn && customerEmail) {
+        if (isLoggedIn && email) {
             navigateToAppHomeScreen();
         };
 
@@ -45,8 +49,10 @@ export const SignInScreen = (props) => {
             if (dbResult.rows.length === Number(1)) {
                 loginStatus = true;
 
-                setCustomerEmail(dbResult.rows._array[0].email);
+                dispatch(authInfoSet(dbResult.rows._array[0].email,true));
+                setEmail(dbResult.rows._array[0].email);
                 setIsLoggedIn(true);
+
 
             };
 

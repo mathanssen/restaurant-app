@@ -1,17 +1,23 @@
 import React, {useState, useEffect} from "react";
+import {useSelector, useDispatch} from 'react-redux';
+
 import {View, Text, Button, KeyboardAvoidingView, ScrollView, TextInput, StyleSheet, Alert} from 'react-native';
 import {LinearGradient} from "expo-linear-gradient";
 import Colors from "../../constants/Colors";
-import {SignupScreen} from "../auth/SignupScreen";
 import {fetchCustomer, deleteCustomer, updateCustomer} from "../../helpers/db";
 import {HeaderButtons, Item} from "react-navigation-header-buttons";
 import {CustomHeaderButton} from "../../components/HeaderButton";
-import {OrdersScreen} from "../orders/OrdersScreen";
+import {authInfoSet} from "../../store/actions/restaurant";
+
 
 export const UserProfileScreen = (props) => {
 
+    const authInfo = useSelector(state => state.restaurant.authInfo)[0];
+
+    const [email, setEmail] = useState(authInfo.userEmail);
+    const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn);
+
     const [isLoading, setIsLoading] = useState(false);
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
@@ -19,19 +25,19 @@ export const UserProfileScreen = (props) => {
     const [addressLat, setAddressLat] = useState(0);
     const [addressLng, setAddressLng] = useState(0);
 
-    const customerEmail = props.navigation.getParam('customerEmail');
-    const [isLoggedIn, setIsLoggedIn] = useState(props.navigation.getParam('isLoggedIn'));
+    // Redux Dispatch to call actions
+    const dispatch = useDispatch();
 
     const dbTestScriptHandler = () => {
         props.navigation.navigate('DBTestScripts')
     }
 
-    const navigateToSignin = () => {
+    const logoutHandler = () => {
+
+        dispatch(authInfoSet('', false));
+
         props.navigation.navigate({
             routeName: 'Signin',
-            params: {
-                isLoggedIn: false,
-            }
         });
     };
 
@@ -51,7 +57,7 @@ export const UserProfileScreen = (props) => {
         let accountExists = false;
 
         try {
-            const dbResult = await fetchCustomer(customerEmail);
+            const dbResult = await fetchCustomer(email);
 
             if (dbResult.rows.length === 1) {
                 accountExists = true;
@@ -192,7 +198,7 @@ export const UserProfileScreen = (props) => {
                                 <Button title="Update Profile" color={Colors.accentColor} onPress={updateProfileHandler}/>
                             </View>
                             <View style={styles.buttonContainer} onPress={updateProfileHandler}>
-                                <Button title="Back to Login" color={Colors.accentColor} onPress={navigateToSignin}/>
+                                <Button title="Logout" color={Colors.accentColor} onPress={logoutHandler}/>
                             </View>
 
                             <View style={styles.buttonContainer} onPress={updateProfileHandler}>

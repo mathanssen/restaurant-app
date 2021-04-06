@@ -3,9 +3,19 @@ import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import { enableScreens } from 'react-native-screens';
 import AppNavigator from "./navigation/AppNavigator";
+import {createStore, combineReducers} from 'redux';
+import { Provider } from 'react-redux';
 import {dbInit} from "./helpers/db";
+import {restaurantReducer} from "./store/reducers/restaurant";
+
 
 enableScreens();
+
+// Initialize Store
+const rootReducer = combineReducers({
+    restaurant: restaurantReducer
+})
+const store = createStore(rootReducer);
 
 // Fonts - Fetch and Load
 const fetchFonts = () => {
@@ -39,6 +49,8 @@ export default function App() {
     }
 
     return (
-        <AppNavigator />
+        <Provider store={store}>
+            <AppNavigator />
+        </Provider>
     );
 }
