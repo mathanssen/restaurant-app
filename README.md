@@ -1,6 +1,5 @@
-# Restaurant-App
+# Readme.md - Restaurant-App
 
-## Readme.md
 # Program/Course Info
 
 |  |  |
@@ -18,12 +17,10 @@
 | 101303562 | Matheus Hanssen |
 | 101260567 | Mohammad Jamshed Qureshi |
 
-
 # App Components
 
 | Component   | Owner |
 | ----------- | ----------- |
-
 | Menu  |MH |
 | Favourites | MH |
 | Orders | MH |
@@ -35,20 +32,7 @@
 | User Signup View |MQ |
 | User Profil View | MQ |
 
-# Group Info
-
-## Project Group 11
-
- ()
-Mohammad Jamshed Qureshi (101260567)
-
-
-Application Components:
-
-
-
-
-# Issues
+# Open Issues
 
  - Proceed to Cart Button MH
  - Orders Listing - JQ
