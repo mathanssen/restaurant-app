@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
-export const ConfirmationScreen = (props) => {
+export const ConfirmationScreen = () => {
   /*
    * @TODO use navigator to go to home screen
    */

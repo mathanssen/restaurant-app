@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from "react-redux";
 import {
   StyleSheet,
   View,
   Text,
   Image,
   Button,
+  TextInput,
   FlatList,
   LogBox,
   ActivityIndicator,
   Switch,
   TouchableOpacity,
-  Platform, Alert,
+  Platform,
+  Alert,
 } from "react-native";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -20,20 +22,12 @@ import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
 import Modal from "react-native-modal";
-import {authInfoSet} from "../../store/actions/restaurant";
-import {fetchCustomer} from "../../helpers/db";
+import { authInfoSet } from "../../store/actions/restaurant";
+import { fetchCustomer } from "../../helpers/db";
+import { insertCustomerOrder, fetchCustomerOrders } from "../../helpers/db";
+import { CreditCardInput } from "react-native-credit-card-input";
 
-export const HomeScreen = (props) => {
-
-  const authInfo = useSelector(state => state.restaurant.authInfo)[0];
-  const [email, setEmail] = useState(authInfo.userEmail);
-  const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn)
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-
-
-
+export const HomeScreen = () => {
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -52,6 +46,36 @@ export const HomeScreen = (props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const [modalDescription, setModalDescription] = useState("");
+
+  // Checkout Variables
+  const [checkoutName, setCheckoutName] = React.useState(null);
+  const [checkoutPhone, setCheckoutPhone] = React.useState(null);
+  const [checkoutBillingAddress, setCheckoutBillingAddress] = React.useState(
+    null
+  );
+  const [checkoutShippingAddress, setCheckoutShippingAddress] = React.useState(
+    null
+  );
+  const [checkoutEmail, setCheckoutEmail] = React.useState(null);
+  const [checkoutSubtotalAmount, setCheckoutSubtotalAmount] = React.useState(0);
+  const [checkoutDiscountPercent, setCheckoutDiscountPercent] = React.useState(
+    0
+  );
+  const [checkoutCardNumber, setCheckoutCardNumber] = React.useState(null);
+  const [checkoutCvc, setCheckoutCvc] = React.useState(null);
+  const [checkoutExpiryDate, setCheckoutExpiryDate] = React.useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+
+  // Confirmation Variables
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  // User Variables
+  const authInfo = useSelector((state) => state.restaurant.authInfo)[0];
+  const [userEmail, setUserEmail] = useState(authInfo.userEmail);
+  const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn);
+  const [userName, setUserName] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+  const [userAddress, setUserAddress] = useState("");
 
   // Category Array
   const categoryData = [
@@ -84,26 +108,131 @@ export const HomeScreen = (props) => {
   const fetchCustomerData = async () => {
     let accountExists = false;
     try {
-      const dbResult = await fetchCustomer(email);
+      const dbResult = await fetchCustomer(userEmail);
 
       if (dbResult.rows.length === 1) {
         accountExists = true;
-        setEmail(dbResult.rows._array[0].email);
-        setName(dbResult.rows._array[0].name);
-        setPhone(dbResult.rows._array[0].phone);
-        setAddress(dbResult.rows._array[0].address);
-      };
-
+        setUserEmail(dbResult.rows._array[0].email);
+        setUserName(dbResult.rows._array[0].name);
+        setUserPhone(dbResult.rows._array[0].phone);
+        setUserAddress(dbResult.rows._array[0].address);
+      }
     } catch (err) {
-      Alert.alert(
-          'Fetch Data Failed!',
-          'Please try again later!',
-          [{text: 'OK'}]
-      );
+      Alert.alert("Fetch Data Failed!", "Please try again later!", [
+        { text: "OK" },
+      ]);
       console.log(err);
     }
+  };
 
+  // Checkout Functions
+  // Insert order
+  const insertOrderHandler = async () => {
+    try {
+      const dbResult = await insertCustomerOrder(
+        email,
+        name,
+        billingAddress,
+        shippingAddress,
+        subtotalAmount,
+        discountPercent
+      );
+
+      if (dbResult.rowsAffected !== 1) {
+        console.log(
+          `insertCustomerOrder : dbResult.rowsAffected : ${dbResult.rowsAffected}`
+        );
+      }
+    } catch (err) {
+      console.log(`insertCustomerOrder : dbResult.rowsAffected : ${err}`);
+    }
+  };
+
+  function confirmPressed() {
+    // Check it is all filled
+    var errors = "";
+    if (
+      checkoutName == null ||
+      checkoutPhone == null ||
+      checkoutEmail == null ||
+      checkoutBillingAddress == null ||
+      checkoutShippingAddress == null ||
+      checkoutCvc == null ||
+      checkoutCardNumber == null ||
+      checkoutExpiryDate == null
+    ) {
+      Alert.alert("Attention", "Please, fill all of the fields", [
+        { text: "OK" },
+      ]);
+    } else {
+      // Check if phone number and email exist
+
+      let emailExists = emailIsValid(checkoutEmail);
+      let phoneExists = phoneNumberIsValid(checkoutPhone);
+      if (emailExists == false) {
+        errors += "Email is not valid" + "\n";
+      }
+      if (phoneExists == false) {
+        errors += "Phone Number is not valid" + "\n";
+      }
+      if (errors == "") {
+        // If it is all right, add order to database
+        // insertOrderHandler;
+        console.log("OK");
+        setShowCheckout(false);
+        setShowCart(false);
+        setShowConfirmation(true);
+      } else {
+        Alert.alert("Attention", errors, [{ text: "OK" }]);
+      }
+    }
   }
+
+  // Confirmation Buttons
+  function backToHome() {
+    console.log("OK");
+  }
+
+  // Cancel pressed
+  function cancelPressed() {
+    setShowCheckout(false);
+  }
+
+  // Check if phone number is valid
+  function phoneNumberIsValid(phoneNumber) {
+    let re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+
+    if (re.test(phoneNumber)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Check if email is valid
+  function emailIsValid(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (re.test(email)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Fetch Order
+  const fetchCustomerOrdersHandler = async () => {
+    try {
+      const dbResult = await fetchCustomerOrders("mathanssen@gmail.com");
+
+      if (dbResult.rowsAffected !== 1) {
+        console.log(
+          `insertCustomerOrder : dbResult.rowsAffected : ${dbResult.rowsAffected}`
+        );
+      }
+    } catch (err) {
+      console.log(`insertCustomerOrder : dbResult.rowsAffected : ${err}`);
+    }
+  };
 
   // Add food to cart
   function addToCart(item, quantity) {
@@ -217,20 +346,7 @@ export const HomeScreen = (props) => {
   useEffect(() => {
     fetchCustomerData();
     getRestaurants();
-
   }, []);
-
-  /*
-   * @TODO use navigator to go to checkout screen
-   */
-  const navigateToPayment = () => {
-    props.navigation.navigate({
-      routeName: "Checkout",
-      params: {
-        order: order,
-      },
-    });
-  };
 
   // Display filter options when the button is pressed
   function renderFilterOptions() {
@@ -287,96 +403,108 @@ export const HomeScreen = (props) => {
   // Render Header
   function renderHeader() {
     return (
-      // If filter option is not enable, show this
       <View>
-        {showOptions == false ? (
-          <View style={styles.header}>
-            {showCart == false ? (
-              <TouchableOpacity
-                onPress={() => {
-                  renderFilterOptions();
-                }}
-                style={styles.filter}
-              >
-                <Image
-                  source={icons.filter}
-                  resizeMode="contain"
-                  style={styles.img}
-                />
-              </TouchableOpacity>
+        {showConfirmation == false ? (
+          <View>
+            {showCheckout == false ? (
+              // If filter option is not enable, show this
+              <View>
+                {showOptions == false ? (
+                  <View style={styles.header}>
+                    {showCart == false ? (
+                      <TouchableOpacity
+                        onPress={() => {
+                          renderFilterOptions();
+                        }}
+                        style={styles.filter}
+                      >
+                        <Image
+                          source={icons.filter}
+                          resizeMode="contain"
+                          style={styles.img}
+                        />
+                      </TouchableOpacity>
+                    ) : (
+                      <Text></Text>
+                    )}
+                    <TouchableOpacity
+                      onPress={() => {
+                        displayCart();
+                      }}
+                      style={styles.cart}
+                    >
+                      {showCart == false ? (
+                        <Image
+                          source={icons.basket}
+                          resizeMode="contain"
+                          style={styles.cartImg}
+                        />
+                      ) : (
+                        <Image
+                          source={icons.back}
+                          resizeMode="contain"
+                          style={styles.cartImg}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  // If filter is enable, show this
+                  <View style={styles.filterOptions}>
+                    <Text style={styles.filterText}>Filter Options</Text>
+                    <Text style={styles.filterTextDetail}>
+                      Price Max.: ${sliderValue}
+                    </Text>
+                    <Slider
+                      style={styles.slider}
+                      minimumValue={0}
+                      step={1}
+                      maximumValue={30}
+                      minimumTrackTintColor="black"
+                      maximumTrackTintColor="black"
+                      value={sliderValue}
+                      onValueChange={(e) => {
+                        setSliderValue(e);
+                      }}
+                    />
+                    <Text style={styles.filterTextDetail}>Category</Text>
+                    <DropDownPicker
+                      style={styles.dropDownPicker}
+                      dropDownMaxHeight={200}
+                      items={categoryData}
+                      defaultIndex={0}
+                      onChangeItem={(item) => {
+                        console.log(item.value);
+                        setSelectedCategory(item.value);
+                      }}
+                    />
+                    <Text style={styles.filterTextDetail}>
+                      Only Available Restaurants
+                    </Text>
+                    <Switch
+                      style={styles.switch}
+                      trackColor={{ false: "#767577", true: "#767577" }}
+                      thumbColor={isEnabled ? "green" : "#f4f3f4"}
+                      onValueChange={setIsEnabled}
+                      value={isEnabled}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        renderFilterOptions();
+                      }}
+                      style={styles.buttonFilter}
+                    >
+                      <Text style={[styles.applyText]}>Apply</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
             ) : (
-              <Text></Text>
+              <View></View>
             )}
-            <TouchableOpacity
-              onPress={() => {
-                displayCart();
-              }}
-              style={styles.cart}
-            >
-              {showCart == false ? (
-                <Image
-                  source={icons.basket}
-                  resizeMode="contain"
-                  style={styles.cartImg}
-                />
-              ) : (
-                <Image
-                  source={icons.back}
-                  resizeMode="contain"
-                  style={styles.cartImg}
-                />
-              )}
-            </TouchableOpacity>
           </View>
         ) : (
-          // If filter is enable, show this
-          <View style={styles.filterOptions}>
-            <Text style={styles.filterText}>Filter Options</Text>
-            <Text style={styles.filterTextDetail}>
-              Price Max.: ${sliderValue}
-            </Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              step={1}
-              maximumValue={30}
-              minimumTrackTintColor="black"
-              maximumTrackTintColor="black"
-              value={sliderValue}
-              onValueChange={(e) => {
-                setSliderValue(e);
-              }}
-            />
-            <Text style={styles.filterTextDetail}>Category</Text>
-            <DropDownPicker
-              style={styles.dropDownPicker}
-              dropDownMaxHeight={200}
-              items={categoryData}
-              defaultIndex={0}
-              onChangeItem={(item) => {
-                console.log(item.value);
-                setSelectedCategory(item.value);
-              }}
-            />
-            <Text style={styles.filterTextDetail}>
-              Only Available Restaurants
-            </Text>
-            <Switch
-              style={styles.switch}
-              trackColor={{ false: "#767577", true: "#767577" }}
-              thumbColor={isEnabled ? "green" : "#f4f3f4"}
-              onValueChange={setIsEnabled}
-              value={isEnabled}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                renderFilterOptions();
-              }}
-              style={styles.buttonFilter}
-            >
-              <Text style={[styles.applyText]}>Apply</Text>
-            </TouchableOpacity>
-          </View>
+          <View></View>
         )}
       </View>
     );
@@ -397,7 +525,7 @@ export const HomeScreen = (props) => {
   }
 
   // Render Cart
-  function renderCart(props) {
+  function renderCart() {
     const renderItem = ({ item }) => (
       <TouchableOpacity
         style={styles.cartTouchable}
@@ -478,64 +606,186 @@ export const HomeScreen = (props) => {
     );
 
     return (
-      // If cart option is not enable, show this
       <View>
-        {showCart == false && showOptions == false ? (
+        {showCheckout == false ? (
+          // If cart option is not enable, show this
           <View>
-            {isLoading ? (
-              <ActivityIndicator
-                animating={true}
-                size="large"
-                color={Platform.os === "ios" ? "#afafaf" : "#00a800"}
-                style={styles.loading}
-              />
-            ) : (
-              <FlatList
-                data={data}
-                keyExtractor={(item) => `${item.Id}`}
-                renderItem={renderItem}
-                contentContainerStyle={styles.flatList}
-              />
-            )}
-          </View>
-        ) : (
-          <View>
-            {showOptions == false ? (
-              // If cart is enable, show this
+            {showCart == false && showOptions == false ? (
               <View>
-                {cart.length > 0 ? (
-                  <View>
-                    <FlatList
-                      data={cart}
-                      keyExtractor={(item) => `${item.Id}`}
-                      renderItem={renderItemCart}
-                      contentContainerStyle={styles.cartFlatList}
-                    />
-                    <Text style={styles.cartSubtotal}>
-                      Subtotal: ${subtotal}
-                    </Text>
-                    <Text style={styles.cartDiscount}>
-                      Discount: {discount}%{" "}
-                    </Text>
-                    <Text style={styles.cartFinalAmount}>
-                      Final Amount: ${finalAmount}{" "}
-                    </Text>
-                    <Button
-                      onPress={navigateToPayment}
-                      title="Proceed to Checkout"
-                      color={COLORS.primary}
-                    />
-
-                    <Text>{email} {name}</Text>
-                  </View>
+                {isLoading ? (
+                  <ActivityIndicator
+                    animating={true}
+                    size="large"
+                    color={Platform.os === "ios" ? "#afafaf" : "#00a800"}
+                    style={styles.loading}
+                  />
                 ) : (
-                  <Text style={styles.cartEmpty}>Your cart is empty :(</Text>
+                  <FlatList
+                    data={data}
+                    keyExtractor={(item) => `${item.Id}`}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.flatList}
+                  />
                 )}
               </View>
             ) : (
-              <Text></Text>
+              <View>
+                {showOptions == false ? (
+                  // If cart is enable, show this
+                  <View>
+                    {cart.length > 0 ? (
+                      <View>
+                        <FlatList
+                          data={cart}
+                          keyExtractor={(item) => `${item.Id}`}
+                          renderItem={renderItemCart}
+                          contentContainerStyle={styles.cartFlatList}
+                        />
+                        <Text style={styles.cartSubtotal}>
+                          Subtotal: ${subtotal}
+                        </Text>
+                        <Text style={styles.cartDiscount}>
+                          Discount: {discount}%{" "}
+                        </Text>
+                        <Text style={styles.cartFinalAmount}>
+                          Final Amount: ${finalAmount}{" "}
+                        </Text>
+                        <Button
+                          onPress={() => {
+                            setShowCheckout(true);
+                            console.log(showCheckout);
+                          }}
+                          title="Proceed to Checkout"
+                          color={COLORS.primary}
+                        />
+
+                        {/* <Text>
+                      {email} {name}
+                    </Text> */}
+                      </View>
+                    ) : (
+                      <Text style={styles.cartEmpty}>
+                        Your cart is empty :(
+                      </Text>
+                    )}
+                  </View>
+                ) : (
+                  <Text></Text>
+                )}
+              </View>
             )}
           </View>
+        ) : (
+          <View></View>
+        )}
+      </View>
+    );
+  }
+
+  // Checkout Screen
+  function renderCheckout() {
+    return (
+      <View>
+        {showCheckout == true ? (
+          <View>
+            <TextInput
+              placeholder="Name"
+              value={checkoutName}
+              onChangeText={setCheckoutName}
+              style={styles.checkoutInput}
+            />
+            <TextInput
+              placeholder="Phone Number"
+              value={checkoutPhone}
+              keyboardType="numeric"
+              onChangeText={setCheckoutPhone}
+              style={styles.checkoutInput}
+              maxLength={10}
+            />
+            <TextInput
+              placeholder="Email"
+              keyboardType="email-address"
+              value={checkoutEmail}
+              onChangeText={setCheckoutEmail}
+              style={styles.checkoutInput}
+            />
+            <TextInput
+              placeholder="Billing Address"
+              value={checkoutBillingAddress}
+              onChangeText={setCheckoutBillingAddress}
+              style={styles.checkoutInput}
+            />
+            <TextInput
+              placeholder="Shipping Address"
+              value={checkoutShippingAddress}
+              onChangeText={setCheckoutShippingAddress}
+              style={styles.checkoutInput}
+            />
+            <CreditCardInput
+              onChange={(form) => {
+                setCheckoutCardNumber(form.values.number);
+                setCheckoutCvc(form.values.cvc);
+                setCheckoutExpiryDate(form.values.expiry);
+              }}
+              allowScroll={true}
+              additionalInputsProps={{
+                number: {
+                  maxLength: 19,
+                },
+              }}
+              cardScale={1}
+              inputContainerStyle={styles.checkoutCardInput}
+            />
+            <View style={[styles.checkoutContainerButton]}>
+              <TouchableOpacity
+                onPress={() => {
+                  confirmPressed();
+                }}
+                style={[styles.checkoutButton]}
+              >
+                <Text style={[styles.checkoutText]}>Confirm</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  cancelPressed();
+                  console.log(showCheckout);
+                }}
+                style={[styles.checkoutButtonCancel]}
+              >
+                <Text style={[styles.checkoutText]}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <View></View>
+        )}
+      </View>
+    );
+  }
+
+  function renderConfirmation() {
+    return (
+      <View>
+        {showConfirmation == true ? (
+          <View style={styles.confirmationContainer}>
+            <Image
+              style={styles.confirmationLogo}
+              source={require("../../assets/images/confirmation.png")}
+            />
+
+            <Text style={styles.confirmationOrderPlaced}>
+              Your order has been placed!
+            </Text>
+            <TouchableOpacity
+              onPress={backToHome()}
+              style={[styles.confirmationButton]}
+            >
+              <Text style={styles.confirmationText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View></View>
         )}
       </View>
     );
@@ -547,13 +797,10 @@ export const HomeScreen = (props) => {
       {renderHeader()}
       {renderModal()}
       {renderCart()}
+      {renderCheckout()}
+      {renderConfirmation()}
     </View>
   );
-};
-
-// Navigation Settings
-HomeScreen.navigationOptions = {
-  headerTitle: "Home",
 };
 
 // Style
@@ -801,6 +1048,122 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+
+  checkoutContainer: {
+    flex: 1,
+    backgroundColor: COLORS.lightGray4,
+    marginTop: 40,
+    paddingHorizontal: 24,
+  },
+  checkoutContainerButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "center",
+  },
+  checkoutContainerName: {
+    width: "50%",
+  },
+  checkoutHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    backgroundColor: "red",
+    color: "white",
+    padding: 15,
+  },
+  checkoutInput: {
+    borderColor: "#f0f0f0",
+    backgroundColor: "white",
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 50,
+    margin: 5,
+    padding: 5,
+  },
+  checkoutItemContainer: {
+    backgroundColor: "white",
+    margin: 15,
+  },
+  checkoutItemFlex: {
+    flexDirection: "row",
+    padding: 10,
+    borderBottomColor: "gray",
+    borderBottomWidth: 1,
+  },
+  checkoutItem: {
+    fontSize: 18,
+    paddingHorizontal: 5,
+  },
+  checkoutIcons: {
+    height: 20,
+    width: 20,
+  },
+  checkoutButton: {
+    display: "flex",
+    margin: 20,
+    height: 50,
+    width: 100,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2AC062",
+    shadowColor: "#2AC062",
+    shadowOpacity: 0.4,
+    shadowOffset: { height: 10, width: 0 },
+    shadowRadius: 20,
+  },
+  checkoutButtonCancel: {
+    display: "flex",
+    margin: 20,
+    height: 50,
+    width: 100,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "red",
+    shadowColor: "#2AC062",
+    shadowOpacity: 0.4,
+    shadowOffset: { height: 10, width: 0 },
+    shadowRadius: 20,
+  },
+  checkoutText: {
+    fontSize: 16,
+    textTransform: "uppercase",
+    color: "#FFFFFF",
+  },
+
+  confirmationContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  confirmationOrderPlaced: {
+    fontSize: 25,
+  },
+  confirmationLogo: {
+    width: "60%",
+    height: "60%",
+    resizeMode: "contain",
+    marginTop: 120,
+  },
+  confirmationButton: {
+    display: "flex",
+    marginTop: 30,
+    height: 50,
+    width: 100,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2AC062",
+    shadowColor: "#2AC062",
+    shadowOpacity: 0.4,
+    shadowOffset: { height: 10, width: 0 },
+    shadowRadius: 20,
+  },
+  confirmationText: {
+    fontSize: 16,
+    textTransform: "uppercase",
+    color: "#FFFFFF",
   },
 });
 

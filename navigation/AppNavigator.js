@@ -47,22 +47,22 @@ const defaultStackNavOptions = {
 };
 
 
-const PaymentNavigator = createStackNavigator(
-  {
-    Home: {
-      screen: HomeScreen,
-    },
-    Checkout: {
-      screen: CheckoutScreen,
-    },
-    Confirmation: {
-      screen: ConfirmationScreen,
-    },
-  },
-  {
-    defaultNavigationOptions: defaultStackNavOptions,
-  }
-);
+// const PaymentNavigator = createStackNavigator(
+//   {
+//     Home: {
+//       screen: HomeScreen,
+//     },
+//     Checkout: {
+//       screen: CheckoutScreen,
+//     },
+//     Confirmation: {
+//       screen: ConfirmationScreen,
+//     },
+//   },
+//   {
+//     defaultNavigationOptions: defaultStackNavOptions,
+//   }
+// );
 
 const AuthNavigator = createStackNavigator(
   {
@@ -258,7 +258,7 @@ const MainNavigator = createDrawerNavigator(
 const MainSwitchNavigator = createSwitchNavigator({
   Auth: AuthNavigator,
   Store: MainNavigator,
-  Payment: PaymentNavigator,
+  // Payment: PaymentNavigator,
 });
 
 export default createAppContainer(MainSwitchNavigator);
