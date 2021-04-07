@@ -9,7 +9,6 @@ import {HeaderButtons, Item} from "react-navigation-header-buttons";
 import {CustomHeaderButton} from "../../components/HeaderButton";
 import {authInfoSet} from "../../store/actions/restaurant";
 
-
 export const UserProfileScreen = (props) => {
 
     const authInfo = useSelector(state => state.restaurant.authInfo)[0];
@@ -205,10 +204,9 @@ export const UserProfileScreen = (props) => {
                                 <Button title="Delete Account" color={Colors.accentColor} onPress={deleteAccountHandler}/>
                             </View>
 
-
-                            <View style={styles.buttonContainer} onPress={updateProfileHandler}>
-                                <Button title="DB Test Scripts" color={Colors.accentColor} onPress={dbTestScriptHandler}/>
-                            </View>
+                            {/*<View style={styles.buttonContainer} onPress={updateProfileHandler}>*/}
+                            {/*    <Button title="DB Test Scripts" color={Colors.accentColor} onPress={dbTestScriptHandler}/>*/}
+                            {/*</View>*/}
 
 
                         </View>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import {useSelector, useDispatch} from 'react-redux';
 import {
   StyleSheet,
   View,
@@ -10,7 +11,7 @@ import {
   ActivityIndicator,
   Switch,
   TouchableOpacity,
-  Platform,
+  Platform, Alert,
 } from "react-native";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -19,8 +20,20 @@ import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
 import Modal from "react-native-modal";
+import {authInfoSet} from "../../store/actions/restaurant";
+import {fetchCustomer} from "../../helpers/db";
 
 export const HomeScreen = (props) => {
+
+  const authInfo = useSelector(state => state.restaurant.authInfo)[0];
+  const [email, setEmail] = useState(authInfo.userEmail);
+  const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn)
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+
+
+
   // Settings
   LogBox.ignoreAllLogs();
 
@@ -67,6 +80,30 @@ export const HomeScreen = (props) => {
     customerBillingAddress,
     shippingAddress
   );
+
+  const fetchCustomerData = async () => {
+    let accountExists = false;
+    try {
+      const dbResult = await fetchCustomer(email);
+
+      if (dbResult.rows.length === 1) {
+        accountExists = true;
+        setEmail(dbResult.rows._array[0].email);
+        setName(dbResult.rows._array[0].name);
+        setPhone(dbResult.rows._array[0].phone);
+        setAddress(dbResult.rows._array[0].address);
+      };
+
+    } catch (err) {
+      Alert.alert(
+          'Fetch Data Failed!',
+          'Please try again later!',
+          [{text: 'OK'}]
+      );
+      console.log(err);
+    }
+
+  }
 
   // Add food to cart
   function addToCart(item, quantity) {
@@ -178,7 +215,9 @@ export const HomeScreen = (props) => {
 
   // Update functions
   useEffect(() => {
+    fetchCustomerData();
     getRestaurants();
+
   }, []);
 
   /*
@@ -486,6 +525,8 @@ export const HomeScreen = (props) => {
                       title="Proceed to Checkout"
                       color={COLORS.primary}
                     />
+
+                    <Text>{email} {name}</Text>
                   </View>
                 ) : (
                   <Text style={styles.cartEmpty}>Your cart is empty :(</Text>

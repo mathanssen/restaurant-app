@@ -14,18 +14,11 @@ import { CreditCardInput } from "react-native-credit-card-input";
 import { icons, SIZES, COLORS, FONTS } from "../../constants";
 
 export const CheckoutScreen = (props) => {
+
+  console.log(props);
+
   // Settings
   LogBox.ignoreAllLogs();
-
-  // Call Database Init
-  dbInit()
-    .then((res) => {
-      console.log("Database initialization completed");
-    })
-    .catch((err) => {
-      console.log("Database initialization failed");
-      console.log(err);
-    });
 
   // States
   const [name, setName] = React.useState(null);
@@ -141,7 +134,7 @@ export const CheckoutScreen = (props) => {
   // View
   return (
     <View style={styles.container}>
-      <Text>This is {route.params.test}'s profile</Text>;
+
       <TextInput
         placeholder="Name"
         value={name}
