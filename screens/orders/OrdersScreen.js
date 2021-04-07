@@ -35,7 +35,7 @@ export const OrdersScreen = (props) => {
             if (dbResult.rows.length > 0) {
 
                 setOrdersData(dbResult.rows._array);
-                console.log(dbResult)
+                console.log(dbResult.rows._array)
                 // console.log(dbResult.rows._array[0].name)
             };
 
@@ -50,11 +50,13 @@ export const OrdersScreen = (props) => {
     }
 
     return (
+
         <FlatList
             data={ordersData}
-            keyExtractor={item => item.orderId}
+            keyExtractor={item => item.order_id.toString()}
             renderItem={itemData => (
                 <OrderItem
+                    email={itemData.item.customer_id}
                     orderdate={itemData.item.order_date}
                     subtotal={itemData.item.subtotal_amount} />
             )}

@@ -102,6 +102,13 @@ export const HomeScreen = () => {
 
   // Insert order to database
   const insertOrderHandler = async () => {
+
+    console.log(checkoutEmail);
+    var A = checkoutEmail;
+    var B = A.toLowerCase();
+    setCheckoutEmail(B);
+    console.log(checkoutEmail);
+
     try {
       const dbResult = await insertCustomerOrder(
         checkoutEmail,
@@ -151,7 +158,7 @@ export const HomeScreen = () => {
       }
       if (errors == "") {
         // If it is all right, add order to database
-        insertOrderHandler;
+        insertOrderHandler();
         setCart([]);
         setSelectedCategory("");
         setSliderValue(0);
