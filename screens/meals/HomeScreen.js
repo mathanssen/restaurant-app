@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   StyleSheet,
   View,
@@ -21,90 +21,63 @@ import Slider from "@react-native-community/slider";
 import NumericInput from "react-native-numeric-input";
 import Order from "../../classes/Order";
 import Food from "../../classes/Food";
+import * as utils from "../../helpers/utils";
 import Modal from "react-native-modal";
-import { authInfoSet } from "../../store/actions/restaurant";
 import { fetchCustomer } from "../../helpers/db";
-import { insertCustomerOrder, fetchCustomerOrders } from "../../helpers/db";
+import { insertCustomerOrder } from "../../helpers/db";
 import { CreditCardInput } from "react-native-credit-card-input";
 
 export const HomeScreen = () => {
   // Settings
   LogBox.ignoreAllLogs();
 
-  // Variables
-  const [subtotal, setSubtotal] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [finalAmount, setFinalAmount] = useState(0);
+  // Main Screen States
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = React.useState("");
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [sliderValue, setSliderValue] = useState(0);
-  const [showOptions, setShowOptions] = useState(false);
-  const [showCart, setShowCart] = useState(false);
-  const [cart, setCart] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const [modalDescription, setModalDescription] = useState("");
 
-  // Checkout Variables
+  // Filter States
+  const [selectedCategory, setSelectedCategory] = React.useState("");
+  const [sliderValue, setSliderValue] = useState(0);
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  // Cart Screen States
+  const [cart, setCart] = useState([]);
+
+  // Order Information States
+  const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(0);
+
+  // Render Screen States
+  const [showCart, setShowCart] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  // Checkout States
   const [checkoutName, setCheckoutName] = React.useState(null);
   const [checkoutPhone, setCheckoutPhone] = React.useState(null);
-  const [checkoutBillingAddress, setCheckoutBillingAddress] = React.useState(
-    null
-  );
-  const [checkoutShippingAddress, setCheckoutShippingAddress] = React.useState(
-    null
-  );
+  const [checkoutBillAddress, setCheckoutBillAddress] = React.useState(null);
+  const [checkoutShipAddress, setCheckoutShipAddress] = React.useState(null);
   const [checkoutEmail, setCheckoutEmail] = React.useState(null);
-  const [checkoutSubtotalAmount, setCheckoutSubtotalAmount] = React.useState(0);
-  const [checkoutDiscountPercent, setCheckoutDiscountPercent] = React.useState(
-    0
-  );
   const [checkoutCardNumber, setCheckoutCardNumber] = React.useState(null);
   const [checkoutCvc, setCheckoutCvc] = React.useState(null);
   const [checkoutExpiryDate, setCheckoutExpiryDate] = React.useState(null);
-  const [showCheckout, setShowCheckout] = useState(false);
 
-  // Confirmation Variables
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
-  // User Variables
+  // User Information States
   const authInfo = useSelector((state) => state.restaurant.authInfo)[0];
   const [userEmail, setUserEmail] = useState(authInfo.userEmail);
-  const [isLoggedIn, setIsLoggedIn] = useState(authInfo.isLoggedIn);
   const [userName, setUserName] = useState("");
-  const [userPhone, setUserPhone] = useState("");
   const [userAddress, setUserAddress] = useState("");
 
-  // Category Array
-  const categoryData = [
-    { label: "Italian", value: "Italian" },
-    { label: "North American", value: "North American" },
-    { label: "Meditterranean", value: "Meditterranean" },
-    { label: "Indian", value: "Indian" },
-    { label: "Dessert", value: "Dessert" },
-    { label: "Mexican", value: "Mexican" },
-    { label: "Soup", value: "Soup" },
-    { label: "Hot Beverage", value: "Hot Beverage" },
-    { label: "Middle eastern food", value: "Middle eastern food" },
-    { label: "Persian", value: "Persian" },
-    { label: "Japanese", value: "Japanese" },
-    { label: "Others", value: "Others" },
-  ];
+  // Variables
+  const categoryData = utils.categoryData;
+  const order = new Order(userName, userAddress, userAddress);
 
-  /*
-   * @TODO get information from the current user
-   */
-  const customerName = "Matheus";
-  const customerBillingAddress = "Street";
-  const shippingAddress = "Queen";
-  const order = new Order(
-    customerName,
-    customerBillingAddress,
-    shippingAddress
-  );
-
+  // Get user information
   const fetchCustomerData = async () => {
     let accountExists = false;
     try {
@@ -114,7 +87,6 @@ export const HomeScreen = () => {
         accountExists = true;
         setUserEmail(dbResult.rows._array[0].email);
         setUserName(dbResult.rows._array[0].name);
-        setUserPhone(dbResult.rows._array[0].phone);
         setUserAddress(dbResult.rows._array[0].address);
       }
     } catch (err) {
@@ -125,17 +97,16 @@ export const HomeScreen = () => {
     }
   };
 
-  // Checkout Functions
-  // Insert order
+  // Insert order to database
   const insertOrderHandler = async () => {
     try {
       const dbResult = await insertCustomerOrder(
-        email,
-        name,
-        billingAddress,
-        shippingAddress,
-        subtotalAmount,
-        discountPercent
+        checkoutEmail,
+        checkoutName,
+        checkoutBillAddress,
+        checkoutShipAddress,
+        subtotal,
+        discount
       );
 
       if (dbResult.rowsAffected !== 1) {
@@ -148,6 +119,7 @@ export const HomeScreen = () => {
     }
   };
 
+  // Checkout Screen: confirm order
   function confirmPressed() {
     // Check it is all filled
     var errors = "";
@@ -155,8 +127,8 @@ export const HomeScreen = () => {
       checkoutName == null ||
       checkoutPhone == null ||
       checkoutEmail == null ||
-      checkoutBillingAddress == null ||
-      checkoutShippingAddress == null ||
+      checkoutBillAddress == null ||
+      checkoutShipAddress == null ||
       checkoutCvc == null ||
       checkoutCardNumber == null ||
       checkoutExpiryDate == null
@@ -166,9 +138,8 @@ export const HomeScreen = () => {
       ]);
     } else {
       // Check if phone number and email exist
-
-      let emailExists = emailIsValid(checkoutEmail);
-      let phoneExists = phoneNumberIsValid(checkoutPhone);
+      let emailExists = utils.emailIsValid(checkoutEmail);
+      let phoneExists = utils.phoneNumberIsValid(checkoutPhone);
       if (emailExists == false) {
         errors += "Email is not valid" + "\n";
       }
@@ -177,62 +148,30 @@ export const HomeScreen = () => {
       }
       if (errors == "") {
         // If it is all right, add order to database
-        // insertOrderHandler;
-        console.log("OK");
+        insertOrderHandler;
+        setCart([]);
+        setSelectedCategory("");
+        setSliderValue(0);
+        setIsEnabled(false);
+        setShowConfirmation(true);
         setShowCheckout(false);
         setShowCart(false);
-        setShowConfirmation(true);
+        setShowOptions(false);
       } else {
         Alert.alert("Attention", errors, [{ text: "OK" }]);
       }
     }
   }
 
-  // Confirmation Buttons
-  function backToHome() {
-    console.log("OK");
-  }
-
-  // Cancel pressed
+  // Checkout Screen: cancel order
   function cancelPressed() {
     setShowCheckout(false);
   }
 
-  // Check if phone number is valid
-  function phoneNumberIsValid(phoneNumber) {
-    let re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-
-    if (re.test(phoneNumber)) {
-      return true;
-    } else {
-      return false;
-    }
+  // Confirmation Screen Button
+  function backToHome() {
+    setShowConfirmation(false);
   }
-
-  // Check if email is valid
-  function emailIsValid(email) {
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if (re.test(email)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // Fetch Order
-  const fetchCustomerOrdersHandler = async () => {
-    try {
-      const dbResult = await fetchCustomerOrders("mathanssen@gmail.com");
-
-      if (dbResult.rowsAffected !== 1) {
-        console.log(
-          `insertCustomerOrder : dbResult.rowsAffected : ${dbResult.rowsAffected}`
-        );
-      }
-    } catch (err) {
-      console.log(`insertCustomerOrder : dbResult.rowsAffected : ${err}`);
-    }
-  };
 
   // Add food to cart
   function addToCart(item, quantity) {
@@ -286,7 +225,6 @@ export const HomeScreen = () => {
     const restaurantsUrl =
       "https://gist.githubusercontent.com/skd09/8d8a685ffbdae387ebe041f28384c13c/raw/26e97cec1e18243e3d88c90d78d2886535a4b3a6/menu.json";
 
-    console.log("Fetch API");
     return fetch(restaurantsUrl).then((response) =>
       response
         .json()
@@ -342,7 +280,7 @@ export const HomeScreen = () => {
     );
   };
 
-  // Update functions
+  // Get user data and display API data
   useEffect(() => {
     fetchCustomerData();
     getRestaurants();
@@ -367,7 +305,7 @@ export const HomeScreen = () => {
     }
   }
 
-  // Show details when pressed
+  // Show food details when pressed
   function renderModal() {
     return (
       <View>
@@ -400,7 +338,21 @@ export const HomeScreen = () => {
     setModalVisible(!isModalVisible);
   };
 
-  // Render Header
+  // Get current item quantity
+  function getQuantity(item) {
+    var q = 0;
+    if (cart.length > 0) {
+      for (let food = 0; food < cart.length; food++) {
+        if (cart[food].Id == item.Id) {
+          q = cart[food].quantity;
+          break;
+        }
+      }
+    }
+    return q;
+  }
+
+  // Render Header Screen
   function renderHeader() {
     return (
       <View>
@@ -474,7 +426,6 @@ export const HomeScreen = () => {
                       items={categoryData}
                       defaultIndex={0}
                       onChangeItem={(item) => {
-                        console.log(item.value);
                         setSelectedCategory(item.value);
                       }}
                     />
@@ -510,21 +461,7 @@ export const HomeScreen = () => {
     );
   }
 
-  // Get current item quantity
-  function getQuantity(item) {
-    var q = 0;
-    if (cart.length > 0) {
-      for (let food = 0; food < cart.length; food++) {
-        if (cart[food].Id == item.Id) {
-          q = cart[food].quantity;
-          break;
-        }
-      }
-    }
-    return q;
-  }
-
-  // Render Cart
+  // Render Cart Screen
   function renderCart() {
     const renderItem = ({ item }) => (
       <TouchableOpacity
@@ -607,72 +544,73 @@ export const HomeScreen = () => {
 
     return (
       <View>
-        {showCheckout == false ? (
-          // If cart option is not enable, show this
+        {showConfirmation == false ? (
           <View>
-            {showCart == false && showOptions == false ? (
+            {showCheckout == false ? (
+              // If cart option is not enable, show this
               <View>
-                {isLoading ? (
-                  <ActivityIndicator
-                    animating={true}
-                    size="large"
-                    color={Platform.os === "ios" ? "#afafaf" : "#00a800"}
-                    style={styles.loading}
-                  />
-                ) : (
-                  <FlatList
-                    data={data}
-                    keyExtractor={(item) => `${item.Id}`}
-                    renderItem={renderItem}
-                    contentContainerStyle={styles.flatList}
-                  />
-                )}
-              </View>
-            ) : (
-              <View>
-                {showOptions == false ? (
-                  // If cart is enable, show this
+                {showCart == false && showOptions == false ? (
                   <View>
-                    {cart.length > 0 ? (
-                      <View>
-                        <FlatList
-                          data={cart}
-                          keyExtractor={(item) => `${item.Id}`}
-                          renderItem={renderItemCart}
-                          contentContainerStyle={styles.cartFlatList}
-                        />
-                        <Text style={styles.cartSubtotal}>
-                          Subtotal: ${subtotal}
-                        </Text>
-                        <Text style={styles.cartDiscount}>
-                          Discount: {discount}%{" "}
-                        </Text>
-                        <Text style={styles.cartFinalAmount}>
-                          Final Amount: ${finalAmount}{" "}
-                        </Text>
-                        <Button
-                          onPress={() => {
-                            setShowCheckout(true);
-                            console.log(showCheckout);
-                          }}
-                          title="Proceed to Checkout"
-                          color={COLORS.primary}
-                        />
-
-                        {/* <Text>
-                      {email} {name}
-                    </Text> */}
-                      </View>
+                    {isLoading ? (
+                      <ActivityIndicator
+                        animating={true}
+                        size="large"
+                        color={Platform.os === "ios" ? "#afafaf" : "#00a800"}
+                        style={styles.loading}
+                      />
                     ) : (
-                      <Text style={styles.cartEmpty}>
-                        Your cart is empty :(
-                      </Text>
+                      <FlatList
+                        data={data}
+                        keyExtractor={(item) => `${item.Id}`}
+                        renderItem={renderItem}
+                        contentContainerStyle={styles.flatList}
+                      />
                     )}
                   </View>
                 ) : (
-                  <Text></Text>
+                  <View>
+                    {showOptions == false ? (
+                      // If cart is enable, show this
+                      <View>
+                        {cart.length > 0 ? (
+                          <View>
+                            <FlatList
+                              data={cart}
+                              keyExtractor={(item) => `${item.Id}`}
+                              renderItem={renderItemCart}
+                              contentContainerStyle={styles.cartFlatList}
+                            />
+                            <Text style={styles.cartSubtotal}>
+                              Subtotal: ${subtotal}
+                            </Text>
+                            <Text style={styles.cartDiscount}>
+                              Discount: {discount}%{" "}
+                            </Text>
+                            <Text style={styles.cartFinalAmount}>
+                              Final Amount: ${finalAmount}{" "}
+                            </Text>
+                            <Button
+                              onPress={() => {
+                                setShowCheckout(true);
+                              }}
+                              title="Proceed to Checkout"
+                              color={COLORS.primary}
+                            />
+                          </View>
+                        ) : (
+                          <Text style={styles.cartEmpty}>
+                            Your cart is empty :(
+                          </Text>
+                        )}
+                      </View>
+                    ) : (
+                      <Text></Text>
+                    )}
+                  </View>
                 )}
               </View>
+            ) : (
+              <View></View>
             )}
           </View>
         ) : (
@@ -682,7 +620,7 @@ export const HomeScreen = () => {
     );
   }
 
-  // Checkout Screen
+  // Render Checkout Screen
   function renderCheckout() {
     return (
       <View>
@@ -711,14 +649,14 @@ export const HomeScreen = () => {
             />
             <TextInput
               placeholder="Billing Address"
-              value={checkoutBillingAddress}
-              onChangeText={setCheckoutBillingAddress}
+              value={checkoutBillAddress}
+              onChangeText={setCheckoutBillAddress}
               style={styles.checkoutInput}
             />
             <TextInput
               placeholder="Shipping Address"
-              value={checkoutShippingAddress}
-              onChangeText={setCheckoutShippingAddress}
+              value={checkoutShipAddress}
+              onChangeText={setCheckoutShipAddress}
               style={styles.checkoutInput}
             />
             <CreditCardInput
@@ -749,7 +687,6 @@ export const HomeScreen = () => {
               <TouchableOpacity
                 onPress={() => {
                   cancelPressed();
-                  console.log(showCheckout);
                 }}
                 style={[styles.checkoutButtonCancel]}
               >
@@ -764,6 +701,7 @@ export const HomeScreen = () => {
     );
   }
 
+  // Render Confirmation Screen
   function renderConfirmation() {
     return (
       <View>
@@ -778,7 +716,9 @@ export const HomeScreen = () => {
               Your order has been placed!
             </Text>
             <TouchableOpacity
-              onPress={backToHome()}
+              onPress={() => {
+                backToHome();
+              }}
               style={[styles.confirmationButton]}
             >
               <Text style={styles.confirmationText}>OK</Text>
@@ -982,7 +922,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   buttonFilter: {
-    marginTop: 100,
+    marginTop: 50,
     height: 50,
     width: 100,
     borderRadius: 5,
