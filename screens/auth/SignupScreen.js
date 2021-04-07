@@ -4,6 +4,7 @@ import {LinearGradient} from "expo-linear-gradient";
 import Colors from "../../constants/Colors";
 import {SignInScreen} from "./SignInScreen";
 import {fetchCustomer, insertCustomer} from "../../helpers/db";
+import {phoneNumberIsValid, emailIsValid, showAlert} from '../../helpers/utils'
 
 export const SignupScreen = (props) => {
 
@@ -26,6 +27,40 @@ export const SignupScreen = (props) => {
     };
 
     const signupHandler = async () => {
+
+        // Name
+        if (name.length <= 0) {
+            showAlert('Invalid Name', 'Please enter a Name');
+            return;
+        }
+
+        // emailIsValid
+        if (!emailIsValid(email)) {
+            showAlert('Invalid Email', 'Please enter a valid email address');
+            return;
+        }
+
+        // Password
+        if (password.length <= 0) {
+            showAlert('Invalid Password', 'Please enter a valid password');
+            return;
+        }
+
+        // Phone
+        if (!phoneNumberIsValid(phone)) {
+            showAlert('Invalid Phone Number', 'Please enter a valid phone number');
+            return;
+        }
+
+        // Address
+        if (address.length <= 0) {
+            showAlert('Invalid Address', 'Please enter a valid address');
+            return;
+        }
+
+
+
+
         let accountExists = false;
 
         try {

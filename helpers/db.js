@@ -23,10 +23,10 @@ export const dbInit = () => {
             // console.log(res);
             return dbStmtExec(showCustomers)
         }).then((res) => {
-            // console.log(res);
+            console.log(res);
             return dbStmtExec(showAllOrders)
         }).then((res) => {
-            // console.log(res);
+            console.log(res);
         }).catch(err => {
             console.log('Database initialization failed');
             console.log(err);
@@ -194,6 +194,26 @@ export const updateCustomerOrder = (customerId,orderId, customerName, customerBi
 
     return promise;
 };
+
+// fetchOrders - Fetches all orders for a particular customer
+export const fetchOrders = () => {
+
+    const promise = new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql('SELECT * from orders order by order_date desc',
+                [],
+                (_, result) => {
+                    resolve(result);
+                },
+                (_, err) => {
+                    reject(err);
+                }
+            );
+        });
+    });
+    return promise;
+};
+
 
 // fetchCustomerOrders - Fetches all orders for a particular customer
 export const fetchCustomerOrders = (customerId) => {

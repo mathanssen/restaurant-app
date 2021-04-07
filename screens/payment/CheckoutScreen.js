@@ -103,7 +103,7 @@ export default function CheckoutScreen () {
       }
       if (errors == "") {
         // If it is all right, add order to database
-        insertOrderHandler;
+        insertOrderHandler();
       } else {
         Alert.alert("Attention", errors, [{ text: "OK" }]);
       }

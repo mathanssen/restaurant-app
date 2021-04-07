@@ -5,6 +5,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import Colors from "../../constants/Colors";
 import {loginCustomer} from "../../helpers/db";
 import {authInfoSet} from "../../store/actions/restaurant";
+import {emailIsValid, showAlert} from '../../helpers/utils'
 
 export const SignInScreen = (props) => {
 
@@ -40,6 +41,19 @@ export const SignInScreen = (props) => {
     };
 
     const loginHandler = async () => {
+
+        // emailIsValid
+        if (!emailIsValid(email)) {
+            showAlert('Invalid Email', 'Please enter a valid email address');
+            return;
+        }
+
+        // Password
+        if (password.length <= 0) {
+            showAlert('Empty Password', 'Please enter a valid password');
+            return;
+        }
+
         setIsLoading(true)
         let loginStatus = false;
 

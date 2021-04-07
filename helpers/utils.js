@@ -2,6 +2,8 @@
 // 101260567 | Mohammad Jamshed Qureshi |
 
 // Check if phone number is valid
+import {Alert} from "react-native";
+
 export function phoneNumberIsValid(phoneNumber) {
   let re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
@@ -21,6 +23,16 @@ export function emailIsValid(email) {
     return false;
   }
 }
+
+// showAlert
+export const showAlert = (title, message) => {
+  Alert.alert(
+      title,
+      message,
+      [{text: 'OK'}]
+  );
+};
+
 
 // Category Array
 export const categoryData = [
