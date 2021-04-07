@@ -1,3 +1,6 @@
+// 101303562 | Matheus Hanssen |
+// 101260567 | Mohammad Jamshed Qureshi |
+
 export default class Food {
   constructor(
     Id,

@@ -1,3 +1,6 @@
+// 101303562 | Matheus Hanssen |
+// 101260567 | Mohammad Jamshed Qureshi |
+
 // Check if phone number is valid
 export function phoneNumberIsValid(phoneNumber) {
   let re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
