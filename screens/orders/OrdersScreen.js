@@ -28,7 +28,7 @@ export const OrdersScreen = (props) => {
     const fetchCustomerOrdersData = async () => {
 
         try {
-            const dbResult = await fetchOrders();
+            const dbResult = await fetchCustomerOrders(email);
 
             console.log(dbResult.rows.length)
 

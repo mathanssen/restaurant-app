@@ -102,12 +102,8 @@ export const HomeScreen = () => {
 
   // Insert order to database
   const insertOrderHandler = async () => {
+    console.log(`insertOrderHandler: ${checkoutEmail}`);
 
-    console.log(checkoutEmail);
-    var A = checkoutEmail;
-    var B = A.toLowerCase();
-    setCheckoutEmail(B);
-    console.log(checkoutEmail);
 
     try {
       const dbResult = await insertCustomerOrder(
@@ -157,6 +153,16 @@ export const HomeScreen = () => {
         errors += "Phone Number is not valid" + "\n";
       }
       if (errors == "") {
+
+        console.log(checkoutEmail);
+        var A = checkoutEmail;
+        var B = A.toLowerCase();
+        console.log(`B: ${B}`)
+
+        setCheckoutEmail(B);
+        console.log(checkoutEmail);
+
+
         // If it is all right, add order to database
         insertOrderHandler();
         setCart([]);
